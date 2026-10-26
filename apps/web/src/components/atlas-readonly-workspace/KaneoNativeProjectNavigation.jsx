@@ -1,9 +1,8 @@
-import { FolderKanban } from 'lucide-react';
-
 /**
  * Adapted from Kaneo 67e30f8 `apps/web/src/components/home/home-projects.tsx`.
- * The project cards and responsive grid retain the upstream structure/classes;
- * router/data hooks are replaced by controlled selection props.
+ * The project cards retain the upstream structure; router/data hooks are
+ * replaced by controlled selection props and host classes avoid a Tailwind
+ * runtime dependency.
  */
 export function KaneoNativeProjectNavigation({
   projects = [],
@@ -14,26 +13,22 @@ export function KaneoNativeProjectNavigation({
 }) {
   if (loading) {
     return (
-      <section aria-label="Projects" className="flex flex-col gap-3">
-        <h2 className="font-heading font-semibold text-foreground text-base">Projects</h2>
-        <div aria-label="Loading projects" role="status" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="h-24 animate-pulse rounded-lg border border-border bg-muted/40" />
-          ))}
-        </div>
+      <section aria-label="Projects" className="kaneo-project-list panel">
+        <h2>Projects</h2>
+        <p aria-label="Loading projects" role="status" className="kaneo-muted">Loading projects.</p>
       </section>
     );
   }
 
   if (error) {
-    return <p role="alert" className="text-muted-foreground text-sm">{error}</p>;
+    return <p role="alert" className="kaneo-error">{error}</p>;
   }
 
   if (projects.length === 0) {
     return (
-      <section aria-label="Projects" className="flex flex-col gap-3">
-        <h2 className="font-heading font-semibold text-foreground text-base">Projects</h2>
-        <p className="rounded-lg border border-border bg-card p-5 text-muted-foreground text-sm">
+      <section aria-label="Projects" className="kaneo-project-list panel">
+        <h2>Projects</h2>
+        <p className="kaneo-muted">
           No projects are available from the configured workspace adapter.
         </p>
       </section>
@@ -41,9 +36,9 @@ export function KaneoNativeProjectNavigation({
   }
 
   return (
-    <nav aria-label="Kaneo projects" className="flex flex-col gap-3">
-      <h2 className="font-heading font-semibold text-foreground text-base">Projects</h2>
-      <ul className="grid list-none gap-3 p-0 sm:grid-cols-2 lg:grid-cols-3">
+    <nav aria-label="Kaneo projects" className="kaneo-project-list panel">
+      <h2>Projects</h2>
+      <ul>
         {projects.map((project) => {
           const selected = project.id === selectedProjectId;
           return (
@@ -53,12 +48,15 @@ export function KaneoNativeProjectNavigation({
                 aria-current={selected ? 'page' : undefined}
                 disabled={!onSelectProject}
                 onClick={() => onSelectProject?.(project.id)}
-                className={`flex min-h-16 w-full items-center gap-2 rounded-lg border border-border p-3.5 text-left outline-none transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-80 ${selected ? 'bg-accent/40' : ''}`}
+                className="kaneo-project-choice"
               >
-                <FolderKanban aria-hidden="true" className="size-4 shrink-0 text-muted-foreground" />
-                <span className="min-w-0 flex-1 truncate font-medium text-foreground text-sm">{project.name}</span>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" className="kaneo-project-icon">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <path d="M3 9h18M8 12v5M12 12v3M16 12v5" />
+                </svg>
+                <span className="kaneo-record-name">{project.name}</span>
                 {typeof project.status === 'string' && project.status.length > 0 ? (
-                  <span className="max-w-28 truncate text-muted-foreground text-xs">{project.status}</span>
+                  <span className="kaneo-status">{project.status}</span>
                 ) : null}
               </button>
             </li>
